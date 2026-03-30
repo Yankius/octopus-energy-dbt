@@ -1,0 +1,46 @@
+# --- ENV / SECRETS ---
+environment.env
+*.env
+!*.env.example
+!environment.env.example
+
+# --- DBT BUILD OUTPUTS ---
+target/
+dbt_packages/
+logs/
+
+# --- LOCAL DATA ---
+exports/
+*.duckdb
+*.duckdb.wal
+**/data/*.parquet
+**/data/*.csv
+!**/data/sample.csv
+
+# --- PYTHON ---
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# --- SUPERSET VENDORED SOURCE ---
+# The embedded Superset checkout is very large. Keep only the capstone-specific
+# runtime/config files in this repo and ignore the vendored upstream source.
+superset/**
+!superset/.gitignore
+!superset/README_CAPSTONE.md
+!superset/docker-compose.capstone.yml
+!superset/docker-compose-non-dev.yml
+!superset/docker/
+!superset/docker/.env
+!superset/docker/.env-local.example
+!superset/docker/docker-entrypoint-initdb.d/
+!superset/docker/docker-entrypoint-initdb.d/**
+!superset/docker/pythonpath_dev/
+!superset/docker/pythonpath_dev/**
+!superset/scripts/
+!superset/scripts/start_capstone_superset.sh
+!superset/scripts/stop_capstone_superset.sh
+
+# --- LIGHTWEIGHT SUPERSET RUNTIME ---
+superset_runtime/.env
+superset_runtime/storage/

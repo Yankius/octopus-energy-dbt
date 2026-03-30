@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: bronze
+    schema: main   # DuckDB default
+
+    tables:
+      - name: raw_octopus_consumption
+      - name: raw_octopus_tariffs
+      - name: raw_octopus_agreements

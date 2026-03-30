@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: stg_consumption
+    columns:
+      - name: interval_start_utc
+        tests:
+          - not_null
+          - unique
+
+  - name: stg_tariffs
+    columns:
+      - name: tariff_code
+        tests:
+          - not_null
+
+      - name: valid_from_utc
+        tests:
+          - not_null
+
+  - name: stg_agreements
+    columns:
+      - name: tariff_code
+        tests:
+          - not_null
+
+      - name: valid_from_utc
+        tests:
+          - not_null

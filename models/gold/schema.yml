@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: fct_energy_cost
+    columns:
+      - name: interval_start_utc
+        tests:
+          - not_null
+          - unique
+
+      - name: kwh
+        tests:
+          - not_null
+
+      - name: cost
+        tests:
+          - not_null

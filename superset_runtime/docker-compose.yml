@@ -1,0 +1,53 @@
+services:
+  redis:
+    image: redis:7
+    container_name: octopus_superset_redis
+    restart: unless-stopped
+    volumes:
+      - ./storage/redis:/data
+
+  db:
+    image: postgres:15
+    container_name: octopus_superset_db
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./storage/postgres:/var/lib/postgresql/data
+
+  superset-init:
+    image: ${SUPERSET_IMAGE:-superset-superset:latest}
+    container_name: octopus_superset_init
+    restart: "no"
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env
+    environment:
+      SUPERSET_CONFIG_PATH: /app/pythonpath/superset_config.py
+    volumes:
+      - ./config:/app/pythonpath
+      - ./scripts:/app/scripts
+      - ./storage/superset_home:/app/superset_home
+      - /home/kiril/projects/DEcapstone:/home/kiril/projects/DEcapstone
+    command: ["/bin/sh", "/app/scripts/init_superset.sh"]
+
+  superset:
+    image: ${SUPERSET_IMAGE:-superset-superset:latest}
+    container_name: octopus_superset_app
+    restart: unless-stopped
+    depends_on:
+      superset-init:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    environment:
+      SUPERSET_CONFIG_PATH: /app/pythonpath/superset_config.py
+    ports:
+      - "${SUPERSET_PORT:-8088}:8088"
+    volumes:
+      - ./config:/app/pythonpath
+      - ./storage/superset_home:/app/superset_home
+      - /home/kiril/projects/DEcapstone:/home/kiril/projects/DEcapstone
+    command: ["/bin/sh", "-c", "gunicorn --bind 0.0.0.0:8088 --workers 2 'superset.app:create_app()'"]
