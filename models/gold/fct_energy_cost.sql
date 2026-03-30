@@ -44,7 +44,7 @@ final as (
             else 'day'
         end as time_band
 
-    from consumption_with_agreement c
+    from consumption c
 
     left join tariffs t
         on c.tariff_code = t.tariff_code
