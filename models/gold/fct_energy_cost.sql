@@ -8,39 +8,16 @@ with consumption as (
     select * from {{ ref('stg_consumption') }}
 
     {% if is_incremental() %}
+        -- dbt.dateadd is universal: works in DuckDB and BigQuery
         where interval_start_utc >= (
-            select max(interval_start_utc) - interval '1 day'
+            select {{ dbt.dateadd('day', -1, "max(interval_start_utc)") }}
             from {{ this }}
         )
     {% endif %}
 
 ),
 
-agreements as (
-
-    select * from {{ ref('stg_agreements') }}
-
-),
-
-tariffs as (
-
-    select * from {{ ref('stg_tariffs') }}
-
-),
-
--- Step 1: map consumption → active tariff agreement
-consumption_with_agreement as (
-
-    select
-        c.*,
-        a.tariff_code
-
-    from consumption c
-    left join agreements a
-        on c.interval_start_utc >= a.valid_from_utc
-        and c.interval_start_utc < a.valid_to_utc
-
-),
+-- ... [agreements and tariffs CTEs stay the same] ...
 
 -- Step 2: join tariff rates
 final as (
@@ -48,7 +25,6 @@ final as (
     select
         c.interval_start_utc,
         c.interval_start_uk,
-
         c.kwh,
         c.tariff_code,
         t.unit_rate,
@@ -56,8 +32,10 @@ final as (
         -- 💰 CORE METRIC
         c.kwh * t.unit_rate as cost,
 
-        -- useful analytics fields
-        date_trunc('day', c.interval_start_uk) as usage_date,
+        -- dbt.date_trunc handles the 'day' vs day and order of arguments
+        {{ dbt.date_trunc('day', 'c.interval_start_uk') }} as usage_date,
+        
+        -- extract works the same in both if we keep it simple
         extract(hour from c.interval_start_uk) as hour_of_day,
 
         case 
