@@ -2,7 +2,8 @@ version: 2
 
 sources:
   - name: bronze
-    schema: main   # DuckDB default
+    # This dynamically switches the schema based on the environment
+    schema: "{{ var('DBT_render_schema', 'main') }}" 
 
     tables:
       - name: raw_octopus_consumption
