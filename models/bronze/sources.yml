@@ -2,9 +2,7 @@ version: 2
 
 sources:
   - name: bronze
-    # This dynamically switches the schema based on the environment
-    schema: "{{ var('DBT_render_schema', 'main') }}" 
-
+    schema: octopus_energy_data  # <--- Hardcode it exactly
     tables:
       - name: raw_octopus_consumption
       - name: raw_octopus_tariffs
