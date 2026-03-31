@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: bronze
-    schema: octopus_energy_data  # <--- Hardcode it exactly
+    schema: "{{ 'main' if target.type == 'duckdb' else 'octopus_energy_data' }}"
     tables:
       - name: raw_octopus_consumption
       - name: raw_octopus_tariffs

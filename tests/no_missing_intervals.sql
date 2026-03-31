@@ -6,6 +6,15 @@
 
 with series as (
 
+    {% if target.type == 'duckdb' %}
+    select
+        interval_start_utc
+    from generate_series(
+        (select min(interval_start_utc) from {{ ref('fct_energy_cost') }}),
+        (select max(interval_start_utc) from {{ ref('fct_energy_cost') }}),
+        interval '30 minute'
+    ) as t(interval_start_utc)
+    {% else %}
     select interval_start_utc
     from unnest(
         generate_timestamp_array(
@@ -14,6 +23,7 @@ with series as (
             interval 30 minute
         )
     ) as interval_start_utc
+    {% endif %}
 
 ),
 

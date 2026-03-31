@@ -2,10 +2,16 @@
 
 select
     tariff_code,
-    valid_from_utc,
-    coalesce(valid_to_utc, TIMESTAMP '9999-12-31') as valid_to_utc,
-    valid_from_uk,
-    coalesce(valid_to_uk, TIMESTAMP '9999-12-31') as valid_to_uk,
+    cast(valid_from_utc as {{ dbt.type_timestamp() }}) as valid_from_utc,
+    coalesce(
+        cast(valid_to_utc as {{ dbt.type_timestamp() }}),
+        {{ far_future_timestamp() }}
+    ) as valid_to_utc,
+    cast(valid_from_uk as {{ dbt.type_timestamp() }}) as valid_from_uk,
+    coalesce(
+        cast(valid_to_uk as {{ dbt.type_timestamp() }}),
+        {{ far_future_timestamp() }}
+    ) as valid_to_uk,
     unit_rate
 
 from {{ source('bronze', 'raw_octopus_tariffs') }}
