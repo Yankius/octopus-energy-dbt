@@ -21,6 +21,7 @@ exports/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+*:Zone.Identifier
 
 # --- SUPERSET VENDORED SOURCE ---
 # The embedded Superset checkout is very large. Keep only the capstone-specific
