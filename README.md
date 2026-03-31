@@ -207,7 +207,7 @@ octopus_dbt/
 │       └── schema.yml
 ├── tests/
 │   └── no_missing_intervals.sql
-├── superset_runtime/                   # lightweight local Superset runtime
+├── superset_runtime/                   # committed lightweight Superset runtime for reviewers
 └── README.md
 
 terraform/
@@ -527,6 +527,11 @@ The lightweight runtime lives in:
 
 - [superset_runtime](/home/kiril/projects/DEcapstone/octopus_dbt/superset_runtime/README.md)
 
+Reviewer note:
+
+- `superset_runtime/` is the committed and reproducible Superset path for this project
+- the older `superset/` folder is a legacy local working tree and is not required for reviewer reproduction
+
 Local dashboard example:
 
 ![Superset Octopus dashboard](images/superset_Octopus_Dashboard.png)
@@ -582,7 +587,8 @@ If you want the shortest path to verifying the project:
 2. Review the Kestra flow for ingestion orchestration.
 3. Review dbt models in `models/silver` and `models/gold`.
 4. Run dbt locally against DuckDB or in dbt Cloud against BigQuery.
-5. Open Kestra on `http://localhost:8080`, Superset on `http://localhost:8088`, or the online Looker Studio dashboard.
+5. Reproduce the lightweight local BI layer from `superset_runtime/`.
+6. Open Kestra on `http://localhost:8080`, Superset, or the online Looker Studio dashboard.
 
 This split keeps the privacy-sensitive ingestion path local while making the analytics path easy to review.
 
@@ -610,6 +616,14 @@ python gcp_bridge.py
 8. Run or trigger Kestra for end-to-end local orchestration.
 9. Confirm that the dbt Cloud job is triggered after bronze ingestion.
 10. Explore data locally in Superset.
+
+For local BI reproduction, use the committed lightweight runtime:
+
+```bash
+cd /home/kiril/projects/DEcapstone/octopus_dbt/superset_runtime
+cp .env.example .env
+bash scripts/start.sh
+```
 
 Optional local orchestration command:
 
