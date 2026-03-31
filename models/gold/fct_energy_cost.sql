@@ -6,8 +6,11 @@
 with consumption as (
     select * from {{ ref('stg_consumption') }}
     {% if is_incremental() %}
+        -- We cast the result of the entire dateadd macro to TIMESTAMP
         where cast(interval_start_utc as timestamp) >= (
-            select {{ dbt.dateadd('day', -1, "max(cast(interval_start_utc as timestamp))") }}
+            select cast(
+                {{ dbt.dateadd('day', -1, "max(interval_start_utc)") }}
+            as timestamp)
             from {{ this }}
         )
     {% endif %}
