@@ -6,8 +6,8 @@
 with consumption as (
     select * from {{ ref('stg_consumption') }}
     {% if is_incremental() %}
-        where interval_start_utc >= (
-            select {{ dbt.dateadd('day', -1, "max(interval_start_utc)") }}
+        where cast(interval_start_utc as timestamp) >= (
+            select {{ dbt.dateadd('day', -1, "max(cast(interval_start_utc as timestamp))") }}
             from {{ this }}
         )
     {% endif %}
@@ -19,7 +19,7 @@ agreements as (
 
 tariffs as (
     select * from {{ ref('stg_tariffs') }}
-), -- <--- THIS COMMA IS ESSENTIAL
+),
 
 final as (
 
@@ -45,13 +45,13 @@ final as (
     from consumption c
 
     left join agreements a
-        on c.interval_start_utc >= a.valid_from_utc
-        and c.interval_start_utc < a.valid_to_utc
+        on cast(c.interval_start_utc as timestamp) >= cast(a.valid_from_utc as timestamp)
+        and cast(c.interval_start_utc as timestamp) < cast(a.valid_to_utc as timestamp)
 
     left join tariffs t
         on a.tariff_code = t.tariff_code
-        and c.interval_start_utc >= t.valid_from_utc
-        and c.interval_start_utc < t.valid_to_utc
+        and cast(c.interval_start_utc as timestamp) >= cast(t.valid_from_utc as timestamp)
+        and cast(c.interval_start_utc as timestamp) < cast(t.valid_to_utc as timestamp)
 
 )
 
